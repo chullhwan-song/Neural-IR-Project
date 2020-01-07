@@ -60,11 +60,14 @@ def get_doc_graph(x_r, lq, ld, lf, lg, denses, reuse=True, name_appx="", k=3):
                                 activation=tf.nn.relu, kernel_initializer=tf.glorot_uniform_initializer(),
                                 reuse=reuse_mode, name="conv_"+dim_name)
 
+        
         # ?? (-1, lq, ld, lf) >  (-1, lq, lf, ld) > max pooling하게 위해 이렇게 ...
         conv = tf.transpose(conv, perm=(0, 1, 3, 2)) 
-        # ?? (-1, lq, lf, ld) > max_pooling2d >  (-1, lq, 1, ld)  
+        # ?? (-1, lq, lf, ld) > max_pooling2d >  (-1, lq, 1, ld)          
         pool = tf.layers.max_pooling2d(conv, pool_size=(1, lf), strides=(1, lf), padding="valid",  name="maxpool2d_"+dim_name)
+        # 개인적으론 위에 tf.transpose 하지않고, channel 개념 max pooling > nput = tf.reduce_max( conv, [1, 2], name='pool') > 요거랑 다른게 몰까??
 
+        
         pool = tf.reshape(pool, (-1, lq, ld))
          
         # ? poses >  poses[0] = ld 
